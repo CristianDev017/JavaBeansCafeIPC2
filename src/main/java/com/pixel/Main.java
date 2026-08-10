@@ -1,17 +1,38 @@
 package com.pixel;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import com.pixel.conexion.Conexion;
+import com.pixel.dao.EmpleadoDAO;
+import com.pixel.modelo.Empleado;
+import com.pixel.ui.MainFrame;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+import javax.swing.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDate;
+
+public class Main {
+        public static void main(String[] args) {
+            SwingUtilities.invokeLater(() -> {
+                MainFrame frame = new MainFrame();
+                frame.setVisible(true);
+            });
+
+        // Prueba 1: verificar conexión
+        try (Connection con = Conexion.obtenerConexion()) {
+            System.out.println("Conexión exitosa: " + con.isValid(2));
+        } catch (SQLException e) {
+            System.out.println("Error de conexión: " + e.getMessage());
+        }
+
+        // Prueba 2: registrar y listar empleados usando el DAO
+        EmpleadoDAO dao = new EmpleadoDAO();
+
+        Empleado nuevo = new Empleado("1234567890101", "Juan Pérez", "juan@correo.com",
+                "MESERO", "MATUTINA", 3500.0, LocalDate.now(), true);
+        dao.registrar(nuevo);
+
+        for (Empleado e : dao.listarTodos()) {
+            System.out.println(e);
         }
     }
 }
