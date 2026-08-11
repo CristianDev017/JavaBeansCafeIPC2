@@ -33,7 +33,15 @@ public class MainFrame extends JFrame {
         menuInventario.add(itemGestionInventario);
 
         JMenu menuMenu = new JMenu("Menú");
+        JMenuItem itemGestionMenu = new JMenuItem("Gestión de Menú");
+        itemGestionMenu.addActionListener(e -> abrirGestionMenu());
+        menuMenu.add(itemGestionMenu);
+
         JMenu menuMesas = new JMenu("Mesas");
+        JMenuItem itemControlMesas = new JMenuItem("Control de Mesas");
+        itemControlMesas.addActionListener(e -> abrirControlMesas());
+        menuMesas.add(itemControlMesas);
+
         JMenu menuCuentas = new JMenu("Cuentas");
         JMenu menuReportes = new JMenu("Reportes");
 
@@ -89,5 +97,31 @@ public class MainFrame extends JFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void abrirGestionMenu() {
+        for (JInternalFrame frame : escritorio.getAllFrames()) {
+            if (frame instanceof ProductoInternalFrame) {
+                try { frame.setSelected(true); } catch (Exception ex) { ex.printStackTrace(); }
+                return;
+            }
+        }
+        ProductoInternalFrame internal = new ProductoInternalFrame();
+        escritorio.add(internal);
+        internal.setVisible(true);
+        try { internal.setSelected(true); } catch (Exception ex) { ex.printStackTrace(); }
+    }
+
+    private void abrirControlMesas() {
+        for (JInternalFrame frame : escritorio.getAllFrames()) {
+            if (frame instanceof MesaInternalFrame) {
+                try { frame.setSelected(true); } catch (Exception ex) { ex.printStackTrace(); }
+                return;
+            }
+        }
+        MesaInternalFrame internal = new MesaInternalFrame();
+        escritorio.add(internal);
+        internal.setVisible(true);
+        try { internal.setSelected(true); } catch (Exception ex) { ex.printStackTrace(); }
     }
 }

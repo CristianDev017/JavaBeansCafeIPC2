@@ -1,6 +1,9 @@
 package com.pixel.modelo;
 
+import java.sql.PreparedStatement;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Empleado {
 
@@ -56,5 +59,23 @@ public class Empleado {
     @Override
     public String toString() {
         return nombreCompleto + " (" + dpi + ")";
+    }
+
+    public List<Empleado> listarMeserosActivos() {
+        List<Empleado> lista = new ArrayList<>();
+        String sql = "SELECT * FROM empleado WHERE activo = TRUE AND rol = 'MESERO' ORDER BY nombre_completo";
+
+        try (Connection con = Conexion.obtenerConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(mapearEmpleado(rs));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al listar meseros: " + e.getMessage());
+        }
+        return lista;
     }
 }
