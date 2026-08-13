@@ -1,0 +1,142 @@
+
+-- JAVABEANS CAFE - MODELO FISICO DE BASE DE DATOS
+
+
+CREATE DATABASE IF NOT EXISTS javabeans_cafe
+    DEFAULT CHARACTER SET utf8mb4
+    DEFAULT COLLATE utf8mb4_unicode_ci;
+
+USE javabeans_cafe;
+
+-- 1. EMPLEADO
+
+CREATE TABLE empleado (
+    dpi              VARCHAR(20)     NOT NULL,
+    nombre_completo  VARCHAR(150)    NOT NULL,
+    correo           VARCHAR(150)    NOT NULL,
+    rol              ENUM('MESERO','COCINA','BARISTA','ADMINISTRADOR') NOT NULL,
+    jornada          ENUM('MATUTINA','VESPERTINA','NOCTURNA') NOT NULL,
+    salario          DECIMAL(10,2)   NOT NULL,
+    fecha_contratacion DATE          NOT NULL,
+    activo           BOOLEAN         NOT NULL DEFAULT TRUE,
+    PRIMARY KEY (dpi),
+    UNIQUE KEY uq_empleado_correo (correo)
+);
+
+
+-- 2. NOMINA 
+
+CREATE TABLE nomina (
+    codigo_nomina    INT AUTO_INCREMENT,
+    dpi_empleado     VARCHAR(20)   NOT NULL,
+    fecha_emision    DATE          NOT NULL,
+    tipo_pago        ENUM('QUINCENA','FIN_DE_MES') NOT NULL,
+    monto            DECIMAL(10,2) NOT NULL,
+    estado           ENUM('PENDIENTE','PAGADO') NOT NULL DEFAULT 'PENDIENTE',
+    PRIMARY KEY (codigo_nomina),
+    CONSTRAINT fk_nomina_empleado
+        FOREIGN KEY (dpi_empleado) REFERENCES empleado(dpi)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+-- 3. INSUMO (inventario)
+
+CREATE TABLE insumo (
+    codigo_insumo    INT AUTO_INCREMENT,
+    nombre           VARCHAR(100)  NOT NULL,
+    unidad_medida    VARCHAR(20)   NOT NULL,
+    stock_actual     DECIMAL(10,2) NOT NULL DEFAULT 0,
+    stock_minimo     DECIMAL(10,2) NOT NULL DEFAULT 0,
+    costo            DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (codigo_insumo)
+);
+
+-- 4. COMPRA_INSUMO 
+
+CREATE TABLE compra_insumo (
+    id_compra        INT AUTO_INCREMENT,
+    codigo_insumo    INT           NOT NULL,
+    cantidad         DECIMAL(10,2) NOT NULL,
+    costo_total      DECIMAL(10,2) NOT NULL,
+    fecha_compra     DATE          NOT NULL,
+    PRIMARY KEY (id_compra),
+    CONSTRAINT fk_compra_insumo
+        FOREIGN KEY (codigo_insumo) REFERENCES insumo(codigo_insumo)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+-- 5. PRODUCTO (menú)
+
+CREATE TABLE producto (
+    codigo_producto  INT AUTO_INCREMENT,
+    nombre           VARCHAR(100)  NOT NULL,
+    categoria        ENUM('BEBIDA_CALIENTE','BEBIDA_FRIA','POSTRE','COMIDA') NOT NULL,
+    precio_venta     DECIMAL(10,2) NOT NULL,
+    ruta_foto        VARCHAR(255)  NULL,
+    activo           BOOLEAN       NOT NULL DEFAULT TRUE,
+    PRIMARY KEY (codigo_producto)
+);
+
+-- 6. RECETA 
+CREATE TABLE receta (
+    codigo_producto  INT           NOT NULL,
+    codigo_insumo    INT           NOT NULL,
+    cantidad_requerida DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (codigo_producto, codigo_insumo),
+    CONSTRAINT fk_receta_producto
+        FOREIGN KEY (codigo_producto) REFERENCES producto(codigo_producto)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_receta_insumo
+        FOREIGN KEY (codigo_insumo) REFERENCES insumo(codigo_insumo)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+-- 7. MESA
+
+CREATE TABLE mesa (
+    numero_mesa      INT,
+    capacidad        INT           NOT NULL,
+    estado           ENUM('LIBRE','OCUPADA') NOT NULL DEFAULT 'LIBRE',
+    PRIMARY KEY (numero_mesa)
+);
+
+-- 8. CUENTA 
+
+CREATE TABLE cuenta (
+    id_cuenta        INT AUTO_INCREMENT,
+    numero_mesa      INT           NOT NULL,
+    dpi_mesero       VARCHAR(20)   NOT NULL,
+    fecha_ocupacion  DATETIME      NOT NULL,
+    fecha_liberacion DATETIME      NULL,
+    estado           ENUM('ABIERTA','PAGADA') NOT NULL DEFAULT 'ABIERTA',
+    total             DECIMAL(10,2) NOT NULL DEFAULT 0,
+    propina           DECIMAL(10,2) NOT NULL DEFAULT 0,
+    PRIMARY KEY (id_cuenta),
+    CONSTRAINT fk_cuenta_mesa
+        FOREIGN KEY (numero_mesa) REFERENCES mesa(numero_mesa)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_cuenta_mesero
+        FOREIGN KEY (dpi_mesero) REFERENCES empleado(dpi)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+-- 9. DETALLE_CUENTA
+
+CREATE TABLE detalle_cuenta (
+    id_detalle       INT AUTO_INCREMENT,
+    id_cuenta        INT           NOT NULL,
+    codigo_producto  INT           NOT NULL,
+    cantidad         INT           NOT NULL,
+    subtotal         DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (id_detalle),
+    CONSTRAINT fk_detalle_cuenta
+        FOREIGN KEY (id_cuenta) REFERENCES cuenta(id_cuenta)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_detalle_producto
+        FOREIGN KEY (codigo_producto) REFERENCES producto(codigo_producto)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
