@@ -66,8 +66,6 @@ public class MesaDAO {
 
     public boolean actualizar(Mesa mesa) {
         String sql = "UPDATE mesa SET capacidad = ? WHERE numero_mesa = ?";
-        // El estado NO se actualiza desde aquí: cambia automáticamente
-        // cuando se abre/cierra una cuenta (lo vemos en el módulo de Cuentas).
 
         try (Connection con = Conexion.obtenerConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -81,9 +79,7 @@ public class MesaDAO {
             return false;
         }
     }
-
-    // Usado por CuentaDAO al abrir/cerrar una cuenta. Recibe la conexión
-    // para poder formar parte de la misma transacción (igual que con insumos).
+    
     public void cambiarEstado(Connection con, int numeroMesa, String nuevoEstado) throws SQLException {
         String sql = "UPDATE mesa SET estado = ? WHERE numero_mesa = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {

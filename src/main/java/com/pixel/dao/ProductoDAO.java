@@ -68,8 +68,6 @@ public class ProductoDAO {
                 ps.executeUpdate();
             }
 
-            // Borramos la receta anterior y la volvemos a insertar completa.
-            // Es más simple y seguro que intentar calcular diferencias línea por línea.
             String sqlBorrarReceta = "DELETE FROM receta WHERE codigo_producto = ?";
             try (PreparedStatement ps = con.prepareStatement(sqlBorrarReceta)) {
                 ps.setInt(1, producto.getCodigoProducto());
@@ -137,7 +135,6 @@ public class ProductoDAO {
         }
     }
 
-    // Trae la receta de un producto, con el nombre del insumo incluido (JOIN)
     public List<RecetaItem> obtenerReceta(int codigoProducto) {
         List<RecetaItem> lista = new ArrayList<>();
         String sql = "SELECT r.codigo_insumo, i.nombre, r.cantidad_requerida " +

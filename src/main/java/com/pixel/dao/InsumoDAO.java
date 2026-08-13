@@ -69,9 +69,6 @@ public class InsumoDAO {
     public boolean actualizar(Insumo insumo) {
         String sql = "UPDATE insumo SET nombre=?, unidad_medida=?, stock_minimo=?, costo=? " +
                 "WHERE codigo_insumo=?";
-        // Nota: stock_actual NO se edita aquí directamente, solo mediante
-        // registrarCompra() (entradas) o el descuento automático en Cuentas (salidas).
-        // Esto evita que alguien "cuadre" el inventario a mano sin dejar rastro.
 
         try (Connection con = Conexion.obtenerConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -90,7 +87,7 @@ public class InsumoDAO {
         }
     }
 
-    // Registra una compra Y suma el stock, en una sola transacción
+    // Registra una compra Y suma el stock
     public boolean registrarCompra(int codigoInsumo, double cantidad, double costoTotal) {
         Connection con = null;
         try {
@@ -129,8 +126,6 @@ public class InsumoDAO {
         }
     }
 
-    // Usado internamente por Cuentas para descontar stock al confirmar un pedido.
-    // Retorna false si no hay suficiente stock (y no descuenta nada).
     public boolean descontarStock(Connection con, int codigoInsumo, double cantidad) throws SQLException {
         String sqlVerificar = "SELECT stock_actual FROM insumo WHERE codigo_insumo = ? FOR UPDATE";
         try (PreparedStatement ps = con.prepareStatement(sqlVerificar)) {
@@ -139,7 +134,7 @@ public class InsumoDAO {
                 if (rs.next()) {
                     double stockActual = rs.getDouble("stock_actual");
                     if (stockActual < cantidad) {
-                        return false; // no hay suficiente inventario
+                        return false;
                     }
                 }
             }

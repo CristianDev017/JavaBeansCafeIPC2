@@ -13,7 +13,7 @@ public class EmpleadoInternalFrame extends JInternalFrame {
 
     private final EmpleadoDAO dao = new EmpleadoDAO();
 
-    // Colores tema café (mismos que MainFrame)
+
     private static final Color CAFE_OSCURO = new Color(91, 58, 41);
     private static final Color CAFE_MEDIO  = new Color(121, 85, 72);
     private static final Color CAFE_CLARO  = new Color(166, 124, 82);
@@ -38,7 +38,6 @@ public class EmpleadoInternalFrame extends JInternalFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(FONDO_CREMA);
 
-        // ---------- Panel de formulario (arriba) ----------
         JPanel panelForm = new JPanel(new GridLayout(3, 4, 8, 8));
         panelForm.setBackground(FONDO_CREMA);
         panelForm.setBorder(BorderFactory.createCompoundBorder(
@@ -90,7 +89,7 @@ public class EmpleadoInternalFrame extends JInternalFrame {
         panelForm.add(lblJornada);
         panelForm.add(cbJornada);
 
-        // ---------- Panel de botones ----------
+        //botones
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 8));
         panelBotones.setBackground(FONDO_CREMA);
 
@@ -103,6 +102,9 @@ public class EmpleadoInternalFrame extends JInternalFrame {
         btnActualizar.addActionListener(e -> actualizarEmpleado());
         btnDeshabilitar.addActionListener(e -> deshabilitarEmpleado());
         btnLimpiar.addActionListener(e -> limpiarFormulario());
+        JButton btnHabilitar = new JButton("Habilitar");
+        btnHabilitar.addActionListener(e -> habilitarEmpleado());
+        panelBotones.add(btnHabilitar);
 
         panelBotones.add(btnRegistrar);
         panelBotones.add(btnActualizar);
@@ -114,7 +116,7 @@ public class EmpleadoInternalFrame extends JInternalFrame {
         panelSuperior.add(panelForm, BorderLayout.CENTER);
         panelSuperior.add(panelBotones, BorderLayout.SOUTH);
 
-        // ---------- Tabla (abajo) ----------
+
         String[] columnas = {"DPI", "Nombre", "Correo", "Rol", "Jornada", "Salario", "Activo"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
@@ -292,5 +294,16 @@ public class EmpleadoInternalFrame extends JInternalFrame {
         }
 
         return true;
+    }
+    private void habilitarEmpleado() {
+        String dpi = txtDpi.getText().trim();
+        if (dpi.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Selecciona un empleado de la tabla primero.");
+            return;
+        }
+        dao.habilitar(dpi);
+        JOptionPane.showMessageDialog(this, "Empleado habilitado.");
+        limpiarFormulario();
+        cargarTabla();
     }
 }

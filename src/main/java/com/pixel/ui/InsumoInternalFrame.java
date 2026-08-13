@@ -13,7 +13,7 @@ public class InsumoInternalFrame extends JInternalFrame {
 
     private final InsumoDAO dao = new InsumoDAO();
 
-    // Colores tema café (mismos que MainFrame)
+
     private static final Color CAFE_OSCURO = new Color(91, 58, 41);
     private static final Color CAFE_MEDIO  = new Color(121, 85, 72);
     private static final Color CAFE_CLARO  = new Color(166, 124, 82);
@@ -125,7 +125,6 @@ public class InsumoInternalFrame extends JInternalFrame {
 
         tabla.getSelectionModel().addListSelectionListener(e -> cargarSeleccionEnFormulario());
 
-        // ---------- Alerta visual: fila roja si el stock está bajo (se mantiene igual, solo ajusta el color base) ----------
         tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,

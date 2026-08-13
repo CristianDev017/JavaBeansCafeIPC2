@@ -27,7 +27,7 @@ public class MainFrame extends JFrame {
         new com.pixel.dao.NominaDAO().generarNominasSiCorresponde();
     }
 
-    // ---------- Panel de botones grandes tipo dashboard ----------
+    // Panel de botones
     private JPanel construirPanelBotones() {
         JPanel panel = new JPanel(new GridLayout(1, 6, 8, 8));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

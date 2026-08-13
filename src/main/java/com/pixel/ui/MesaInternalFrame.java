@@ -14,14 +14,13 @@ public class MesaInternalFrame extends JInternalFrame {
 
     private JTextField txtNumero, txtCapacidad;
 
-    // Colores tema café (mismos que MainFrame)
     private static final Color CAFE_OSCURO = new Color(91, 58, 41);
     private static final Color CAFE_MEDIO  = new Color(121, 85, 72);
     private static final Color CAFE_CLARO  = new Color(166, 124, 82);
     private static final Color FONDO_CREMA = new Color(230, 220, 205);
     private static final Color BLANCO      = Color.WHITE;
 
-    // Estados de mesa (se mantienen verde/rojo porque son indicadores funcionales)
+    // Estados de mesa
     private static final Color MESA_LIBRE = new Color(198, 239, 206);
     private static final Color MESA_OCUPADA = new Color(255, 199, 199);
 
@@ -36,7 +35,7 @@ public class MesaInternalFrame extends JInternalFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(FONDO_CREMA);
 
-        // ---------- Formulario para registrar mesas nuevas ----------
+        //registrar mesas nuevas
         JPanel panelForm = new JPanel();
         panelForm.setBackground(FONDO_CREMA);
         panelForm.setBorder(BorderFactory.createCompoundBorder(
@@ -75,7 +74,7 @@ public class MesaInternalFrame extends JInternalFrame {
         panelForm.add(btnRegistrar);
         panelForm.add(btnActualizarCapacidad);
 
-        // ---------- Panel visual de mesas (tarjetas de color) ----------
+        //mesas
         panelMesas = new JPanel(new GridLayout(0, 4, 15, 15));
         panelMesas.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         panelMesas.setBackground(FONDO_CREMA);
@@ -172,7 +171,7 @@ public class MesaInternalFrame extends JInternalFrame {
         tarjeta.setBorder(BorderFactory.createLineBorder(CAFE_OSCURO, 1));
         tarjeta.setPreferredSize(new Dimension(120, 100));
 
-        // El color de estado (libre/ocupada) se mantiene igual: es información funcional, no decorativa
+        // El color de estado libre y ocupada
         Color colorFondo = mesa.getEstado().equals("LIBRE")
                 ? MESA_LIBRE   // verde suave
                 : MESA_OCUPADA;  // rojo suave

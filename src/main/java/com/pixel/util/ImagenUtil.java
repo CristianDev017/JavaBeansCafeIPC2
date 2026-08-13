@@ -13,8 +13,6 @@ public class ImagenUtil {
 
     private static final String CARPETA_IMAGENES = "img";
 
-    // Copia la imagen seleccionada a la carpeta img/ con un nombre único,
-    // y devuelve el nombre de archivo generado (esto es lo que se guarda en la BD).
     public static String guardarImagen(File origen) throws IOException {
         Path carpetaDestino = Paths.get(CARPETA_IMAGENES);
         if (!Files.exists(carpetaDestino)) {

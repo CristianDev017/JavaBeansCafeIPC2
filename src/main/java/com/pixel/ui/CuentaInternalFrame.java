@@ -52,7 +52,7 @@ public class CuentaInternalFrame extends JInternalFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(FONDO_CREMA);
 
-        // ---------- Panel superior: abrir cuenta nueva ----------
+        //Panel superior
         JPanel panelAbrir = new JPanel();
         panelAbrir.setBackground(FONDO_CREMA);
         panelAbrir.setBorder(BorderFactory.createCompoundBorder(
@@ -85,7 +85,7 @@ public class CuentaInternalFrame extends JInternalFrame {
         panelAbrir.add(cbMesero);
         panelAbrir.add(btnAbrir);
 
-        // ---------- Panel central: cuentas abiertas + detalle ----------
+        //  Panel central
         String[] colsCuentas = {"ID", "Mesa", "Mesero", "Total", "Propina"};
         modeloCuentasAbiertas = new DefaultTableModel(colsCuentas, 0) {
             @Override
@@ -101,7 +101,7 @@ public class CuentaInternalFrame extends JInternalFrame {
         ((javax.swing.border.TitledBorder) scrollCuentas.getBorder()).setTitleColor(CAFE_OSCURO);
         scrollCuentas.setPreferredSize(new Dimension(1000, 150));
 
-        // ---------- Panel de detalle de la cuenta seleccionada ----------
+        //Panel de detalle de la cuenta seleccionada
         JPanel panelDetalle = new JPanel(new BorderLayout(5, 5));
         panelDetalle.setBackground(FONDO_CREMA);
         panelDetalle.setBorder(BorderFactory.createCompoundBorder(

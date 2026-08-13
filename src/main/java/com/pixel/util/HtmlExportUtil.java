@@ -6,8 +6,7 @@ import java.io.IOException;
 
 public class HtmlExportUtil {
 
-    // Guarda el HTML directamente en la carpeta Descargas del usuario, sin preguntar nada
-    // y sin abrir el navegador automáticamente.
+
     public static boolean exportarDirecto(String htmlContenido, String nombreArchivo) {
         String carpetaDescargas = System.getProperty("user.home") + File.separator + "Downloads";
         File carpeta = new File(carpetaDescargas);

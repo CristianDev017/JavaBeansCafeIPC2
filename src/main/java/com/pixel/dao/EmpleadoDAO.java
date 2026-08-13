@@ -10,7 +10,7 @@ import java.util.List;
 
 public class EmpleadoDAO {
 
-    // ---------- CREAR ----------
+    // CREAR
     public boolean registrar(Empleado emp) {
         String sql = "INSERT INTO empleado (dpi, nombre_completo, correo, rol, jornada, salario, fecha_contratacion, activo) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -31,7 +31,6 @@ public class EmpleadoDAO {
             return true;
 
         } catch (SQLIntegrityConstraintViolationException e) {
-            // Esto salta si el DPI ya existe (PK duplicada) o el correo ya existe (UNIQUE)
             System.out.println("Error: DPI o correo ya registrado. " + e.getMessage());
             return false;
         } catch (SQLException e) {
@@ -40,7 +39,7 @@ public class EmpleadoDAO {
         }
     }
 
-    // ---------- LISTAR (todos, incluyendo inactivos) ----------
+    // LISTAR
     public List<Empleado> listarTodos() {
         List<Empleado> lista = new ArrayList<>();
         String sql = "SELECT * FROM empleado ORDER BY nombre_completo";
@@ -59,7 +58,7 @@ public class EmpleadoDAO {
         return lista;
     }
 
-    // ---------- LISTAR SOLO ACTIVOS (para asignar meseros, calcular nómina, etc.) ----------
+    // LISTAR SOLO ACTIVOS
     public List<Empleado> listarActivos() {
         List<Empleado> lista = new ArrayList<>();
         String sql = "SELECT * FROM empleado WHERE activo = TRUE ORDER BY nombre_completo";
@@ -96,11 +95,10 @@ public class EmpleadoDAO {
         return lista;
     }
 
-    // ---------- ACTUALIZAR ----------
+    //  ACTUALIZAR
     public boolean actualizar(Empleado emp) {
         String sql = "UPDATE empleado SET nombre_completo=?, correo=?, rol=?, jornada=?, salario=? " +
                 "WHERE dpi=?";
-        // Nota: fecha_contratacion y dpi normalmente no se editan una vez creado el registro.
 
         try (Connection con = Conexion.obtenerConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -120,7 +118,7 @@ public class EmpleadoDAO {
         }
     }
 
-    // ---------- DESHABILITAR (no se borra, por las FK con nomina/cuenta) ----------
+    // DESHABILITAR
     public boolean deshabilitar(String dpi) {
         String sql = "UPDATE empleado SET activo = FALSE WHERE dpi = ?";
 
@@ -136,7 +134,19 @@ public class EmpleadoDAO {
         }
     }
 
-    // ---------- Método privado auxiliar: convierte una fila del ResultSet en un objeto Empleado ----------
+    public boolean habilitar(String dpi) {
+        String sql = "UPDATE empleado SET activo = TRUE WHERE dpi = ?";
+        try (Connection con = Conexion.obtenerConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, dpi);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error al habilitar empleado: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Metodo privado auxiliar
     private Empleado mapearEmpleado(ResultSet rs) throws SQLException {
         Empleado emp = new Empleado();
         emp.setDpi(rs.getString("dpi"));

@@ -9,14 +9,12 @@ import java.util.List;
 
 public class ReporteDAO {
 
-    // ---------- Flujo de caja ----------
-    // Si fechaInicio o fechaFin son null, se incluyen todos los datos (sin filtrar ese extremo).
+    // Flujo de caja
     public FlujoCaja calcularFlujoCaja(LocalDate fechaInicio, LocalDate fechaFin) {
         double ingresos = 0, egresosNomina = 0, egresosCompras = 0;
 
         String condicionFecha = " AND (? IS NULL OR fecha >= ?) AND (? IS NULL OR fecha <= ?)";
 
-        // Ingresos: cuentas PAGADAS (usamos fecha_liberacion como "fecha" del ingreso)
         String sqlIngresos = "SELECT COALESCE(SUM(total + propina), 0) FROM cuenta " +
                 "WHERE estado = 'PAGADA'" +
                 " AND (? IS NULL OR fecha_liberacion >= ?) AND (? IS NULL OR fecha_liberacion <= ?)";
@@ -31,7 +29,6 @@ public class ReporteDAO {
             System.out.println("Error calculando ingresos: " + e.getMessage());
         }
 
-        // Egresos por nómina: solo las PAGADAS
         String sqlNomina = "SELECT COALESCE(SUM(monto), 0) FROM nomina " +
                 "WHERE estado = 'PAGADO'" +
                 " AND (? IS NULL OR fecha_emision >= ?) AND (? IS NULL OR fecha_emision <= ?)";
@@ -46,7 +43,6 @@ public class ReporteDAO {
             System.out.println("Error calculando egresos de nómina: " + e.getMessage());
         }
 
-        // Egresos por compras de insumos
         String sqlCompras = "SELECT COALESCE(SUM(costo_total), 0) FROM compra_insumo " +
                 "WHERE (? IS NULL OR fecha_compra >= ?) AND (? IS NULL OR fecha_compra <= ?)";
         try (Connection con = Conexion.obtenerConexion();
@@ -73,7 +69,7 @@ public class ReporteDAO {
         ps.setObject(4, fin);
     }
 
-    // ---------- Productos más vendidos ----------
+    // Productos más vendidos
     public List<ProductoVendido> productosMasVendidos(LocalDate fechaInicio, LocalDate fechaFin) {
         List<ProductoVendido> lista = new ArrayList<>();
         String sql = "SELECT p.nombre, SUM(d.cantidad) AS total_vendido " +
@@ -99,12 +95,11 @@ public class ReporteDAO {
         return lista;
     }
 
-    // ---------- Insumos con bajo stock (no lleva filtro de fecha, es un estado actual) ----------
+    // Insumos con bajo stock
     public List<com.pixel.modelo.Insumo> insumosBajoStock() {
         return new InsumoDAO().listarConBajoStock();
     }
 
-    // ---------- Clases auxiliares internas para representar resultados de reportes ----------
     public static class FlujoCaja {
         public final double ingresos;
         public final double egresosNomina;

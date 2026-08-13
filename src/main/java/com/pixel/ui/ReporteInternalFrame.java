@@ -35,12 +35,10 @@ public class ReporteInternalFrame extends JInternalFrame {
         JPanel panelFiltros = new JPanel();
         panelFiltros.setBorder(BorderFactory.createTitledBorder("Filtro de fechas"));
 
-        // ---------- Spinner de fecha "Desde" ----------
         spinnerInicio = crearSpinnerFecha();
         chkSinInicio = new JCheckBox("Sin límite inferior");
         chkSinInicio.addActionListener(e -> spinnerInicio.setEnabled(!chkSinInicio.isSelected()));
 
-        // ---------- Spinner de fecha "Hasta" ----------
         spinnerFin = crearSpinnerFecha();
         chkSinFin = new JCheckBox("Sin límite superior");
         chkSinFin.addActionListener(e -> spinnerFin.setEnabled(!chkSinFin.isSelected()));
@@ -81,7 +79,6 @@ public class ReporteInternalFrame extends JInternalFrame {
         add(new JScrollPane(areaResultado), BorderLayout.CENTER);
     }
 
-    // Crea un JSpinner configurado como selector de fecha (día/mes/año), con la fecha de hoy por defecto
     private JSpinner crearSpinnerFecha() {
         JSpinner spinner = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, "yyyy-MM-dd");
@@ -91,7 +88,6 @@ public class ReporteInternalFrame extends JInternalFrame {
         return spinner;
     }
 
-    // Convierte el valor del JSpinner (java.util.Date) a LocalDate, o null si el checkbox "sin límite" está activo
     private LocalDate obtenerFecha(JSpinner spinner, JCheckBox chkSinLimite) {
         if (chkSinLimite.isSelected()) return null;
         Date fecha = (Date) spinner.getValue();
@@ -169,7 +165,7 @@ public class ReporteInternalFrame extends JInternalFrame {
         }
     }
 
-    // ---------- Generadores de HTML (sin cambios respecto a lo que ya tenías) ----------
+    // Generadores de HTML
 
     private String generarHtmlFlujoCaja(ReporteDAO.FlujoCaja flujo, LocalDate inicio, LocalDate fin) {
         String colorBalance = flujo.getBalance() >= 0 ? "#2e7d32" : "#c62828";

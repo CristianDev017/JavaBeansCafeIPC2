@@ -14,23 +14,21 @@ public class CuentaDAO {
     private final InsumoDAO insumoDAO = new InsumoDAO();
     private final MesaDAO mesaDAO = new MesaDAO();
 
-    // ---------- Abrir una cuenta nueva ----------
-    // Devuelve el id_cuenta generado, o -1 si falló (ej. mesa ya ocupada).
+    // Abrir una cuenta nueva
     public int abrirCuenta(int numeroMesa, String dpiMesero) {
         Connection con = null;
         try {
             con = Conexion.obtenerConexion();
             con.setAutoCommit(false);
 
-            // Verificamos que la mesa siga LIBRE en este momento (evita condición de carrera
-            // si dos meseros intentan abrir la misma mesa casi al mismo tiempo).
+            // Verificamos que la mesa siga LIBRE
             String sqlVerificar = "SELECT estado FROM mesa WHERE numero_mesa = ? FOR UPDATE";
             try (PreparedStatement ps = con.prepareStatement(sqlVerificar)) {
                 ps.setInt(1, numeroMesa);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (!rs.next() || !"LIBRE".equals(rs.getString("estado"))) {
                         con.rollback();
-                        return -1; // la mesa no existe o ya está ocupada
+                        return -1; // la mesa ya está ocupada
                     }
                 }
             }
@@ -66,15 +64,15 @@ public class CuentaDAO {
         }
     }
 
-    // ---------- Agregar un producto a la cuenta (descuenta inventario) ----------
-    // Devuelve un mensaje: null si tuvo éxito, o el motivo del error si falló.
+    // Agregar un producto a la cuenta (descuenta inventario)
+
     public String agregarProducto(int idCuenta, int codigoProducto, int cantidad) {
         Connection con = null;
         try {
             con = Conexion.obtenerConexion();
             con.setAutoCommit(false);
 
-            // 1. Traer precio y receta del producto
+            //  Traer precio y receta del producto
             double precioUnitario;
             String sqlPrecio = "SELECT precio_venta FROM producto WHERE codigo_producto = ?";
             try (PreparedStatement ps = con.prepareStatement(sqlPrecio)) {
@@ -88,7 +86,7 @@ public class CuentaDAO {
                 }
             }
 
-            List<int[]> insumosNecesarios = new ArrayList<>(); // [codigoInsumo] paralelo a cantidadesRequeridas
+            List<int[]> insumosNecesarios = new ArrayList<>();
             List<Double> cantidadesRequeridas = new ArrayList<>();
             String sqlReceta = "SELECT codigo_insumo, cantidad_requerida FROM receta WHERE codigo_producto = ?";
             try (PreparedStatement ps = con.prepareStatement(sqlReceta)) {
@@ -101,7 +99,7 @@ public class CuentaDAO {
                 }
             }
 
-            // 2. Descontar cada insumo de la receta (multiplicado por la cantidad pedida)
+            //Descontar cada insumo de la receta (multiplicado por la cantidad pedida)
             for (int i = 0; i < insumosNecesarios.size(); i++) {
                 int codigoInsumo = insumosNecesarios.get(i)[0];
                 double cantidadADescontar = cantidadesRequeridas.get(i);
@@ -113,7 +111,7 @@ public class CuentaDAO {
                 }
             }
 
-            // 3. Insertar el detalle de cuenta
+            // Insertar el detalle de cuenta
             double subtotal = precioUnitario * cantidad;
             String sqlDetalle = "INSERT INTO detalle_cuenta (id_cuenta, codigo_producto, cantidad, subtotal) " +
                     "VALUES (?, ?, ?, ?)";
@@ -125,7 +123,7 @@ public class CuentaDAO {
                 ps.executeUpdate();
             }
 
-            // 4. Actualizar el total acumulado de la cuenta
+            // Actualizar el total acumulado de la cuenta
             String sqlActualizarTotal = "UPDATE cuenta SET total = total + ? WHERE id_cuenta = ?";
             try (PreparedStatement ps = con.prepareStatement(sqlActualizarTotal)) {
                 ps.setDouble(1, subtotal);
@@ -134,7 +132,7 @@ public class CuentaDAO {
             }
 
             con.commit();
-            return null; // éxito
+            return null;
 
         } catch (SQLException e) {
             if (con != null) {
@@ -149,7 +147,7 @@ public class CuentaDAO {
         }
     }
 
-    // ---------- Agregar propina ----------
+    // Agregar propina
     public boolean agregarPropina(int idCuenta, double propina) {
         String sql = "UPDATE cuenta SET propina = propina + ? WHERE id_cuenta = ?";
         try (Connection con = Conexion.obtenerConexion();
@@ -163,7 +161,7 @@ public class CuentaDAO {
         }
     }
 
-    // ---------- Cerrar / cobrar la cuenta ----------
+    //Cerrar / cobrar la cuenta
     public boolean cerrarCuenta(int idCuenta) {
         Connection con = null;
         try {
@@ -191,11 +189,6 @@ public class CuentaDAO {
 
             mesaDAO.cambiarEstado(con, numeroMesa, "LIBRE");
 
-            // NOTA: la propina se carga al pago del mes del mesero (NominaDAO)
-            // en el siguiente módulo que vamos a construir: Nóminas.
-            // Por ahora la propina queda registrada en la cuenta y la
-            // recuperaremos desde ahí al generar la nómina de fin de mes.
-
             con.commit();
             return true;
 
@@ -212,7 +205,7 @@ public class CuentaDAO {
         }
     }
 
-    // ---------- Listar cuentas abiertas ----------
+    // Listar cuentas abiertas
     public List<Cuenta> listarAbiertas() {
         List<Cuenta> lista = new ArrayList<>();
         String sql = "SELECT c.*, e.nombre_completo FROM cuenta c " +
@@ -233,7 +226,7 @@ public class CuentaDAO {
         return lista;
     }
 
-    // ---------- Listar el detalle (productos) de una cuenta ----------
+    //Listar el detalle (productos) de una cuenta
     public List<DetalleCuenta> listarDetalle(int idCuenta) {
         List<DetalleCuenta> lista = new ArrayList<>();
         String sql = "SELECT d.*, p.nombre FROM detalle_cuenta d " +

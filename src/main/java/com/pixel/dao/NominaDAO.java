@@ -18,7 +18,7 @@ public class NominaDAO {
     // Revisa si "hoy" corresponde generar nóminas (5 días antes de quincena o fin de mes)
     // y las genera si aún no existen para ese periodo.
     public void generarNominasSiCorresponde() {
-        LocalDate hoy = LocalDate.now();
+        LocalDate hoy = LocalDate.of(2026, 8, 10);
         YearMonth mesActual = YearMonth.from(hoy);
 
         LocalDate fechaCorteQuincena = mesActual.atDay(15);

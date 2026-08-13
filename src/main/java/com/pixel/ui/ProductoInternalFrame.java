@@ -22,7 +22,6 @@ public class ProductoInternalFrame extends JInternalFrame {
     private final ProductoDAO productoDAO = new ProductoDAO();
     private final InsumoDAO insumoDAO = new InsumoDAO();
 
-    // Colores tema café (mismos que MainFrame)
     private static final Color CAFE_OSCURO = new Color(91, 58, 41);
     private static final Color CAFE_MEDIO  = new Color(121, 85, 72);
     private static final Color CAFE_CLARO  = new Color(166, 124, 82);
@@ -55,7 +54,6 @@ public class ProductoInternalFrame extends JInternalFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(FONDO_CREMA);
 
-        // ---------- Panel izquierdo: datos del producto + foto ----------
         JPanel panelDatos = new JPanel();
         panelDatos.setLayout(new BoxLayout(panelDatos, BoxLayout.Y_AXIS));
         panelDatos.setBackground(FONDO_CREMA);
@@ -113,7 +111,7 @@ public class ProductoInternalFrame extends JInternalFrame {
         panelDatos.add(Box.createVerticalStrut(6));
         panelDatos.add(btnSeleccionarFoto);
 
-        // ---------- Panel de receta ----------
+        // Panel de receta
         JPanel panelReceta = new JPanel(new BorderLayout(5, 5));
         panelReceta.setBackground(FONDO_CREMA);
         panelReceta.setBorder(BorderFactory.createCompoundBorder(
@@ -170,7 +168,7 @@ public class ProductoInternalFrame extends JInternalFrame {
         panelIzquierdo.add(panelDatos);
         panelIzquierdo.add(panelReceta);
 
-        // ---------- Botones principales ----------
+        //Botones principales
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
         panelBotones.setBackground(FONDO_CREMA);
         JButton btnRegistrar = crearBoton("Registrar producto");
@@ -196,7 +194,7 @@ public class ProductoInternalFrame extends JInternalFrame {
         panelIzquierdoConBotones.add(panelIzquierdo, BorderLayout.CENTER);
         panelIzquierdoConBotones.add(panelBotones, BorderLayout.SOUTH);
 
-        // ---------- Tabla de productos (derecha) ----------
+        //Tabla de productos
         String[] columnas = {"Código", "Nombre", "Categoría", "Precio"};
         modeloProductos = new DefaultTableModel(columnas, 0) {
             @Override
