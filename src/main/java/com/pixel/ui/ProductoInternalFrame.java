@@ -22,6 +22,13 @@ public class ProductoInternalFrame extends JInternalFrame {
     private final ProductoDAO productoDAO = new ProductoDAO();
     private final InsumoDAO insumoDAO = new InsumoDAO();
 
+    // Colores tema café (mismos que MainFrame)
+    private static final Color CAFE_OSCURO = new Color(91, 58, 41);
+    private static final Color CAFE_MEDIO  = new Color(121, 85, 72);
+    private static final Color CAFE_CLARO  = new Color(166, 124, 82);
+    private static final Color FONDO_CREMA = new Color(230, 220, 205);
+    private static final Color BLANCO      = Color.WHITE;
+
     private JTextField txtNombre, txtPrecio;
     private JComboBox<String> cbCategoria;
     private JLabel lblFoto;
@@ -46,46 +53,95 @@ public class ProductoInternalFrame extends JInternalFrame {
 
     private void construirUI() {
         setLayout(new BorderLayout(10, 10));
+        getContentPane().setBackground(FONDO_CREMA);
 
         // ---------- Panel izquierdo: datos del producto + foto ----------
         JPanel panelDatos = new JPanel();
         panelDatos.setLayout(new BoxLayout(panelDatos, BoxLayout.Y_AXIS));
-        panelDatos.setBorder(BorderFactory.createTitledBorder("Datos del producto"));
+        panelDatos.setBackground(FONDO_CREMA);
+        panelDatos.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(CAFE_MEDIO, 1),
+                        "Datos del producto"),
+                BorderFactory.createEmptyBorder(8, 8, 8, 8)));
+        ((javax.swing.border.TitledBorder) ((javax.swing.border.CompoundBorder) panelDatos.getBorder()).getOutsideBorder())
+                .setTitleColor(CAFE_OSCURO);
 
         txtNombre = new JTextField();
         txtPrecio = new JTextField();
         cbCategoria = new JComboBox<>(new String[]{"BEBIDA_CALIENTE", "BEBIDA_FRIA", "POSTRE", "COMIDA"});
         lblFoto = new JLabel("Sin imagen");
         lblFoto.setPreferredSize(new Dimension(150, 150));
+        lblFoto.setMaximumSize(new Dimension(150, 150));
+        lblFoto.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblFoto.setHorizontalAlignment(SwingConstants.CENTER);
-        lblFoto.setBorder(BorderFactory.createEtchedBorder());
+        lblFoto.setBorder(BorderFactory.createLineBorder(CAFE_CLARO, 1));
+        lblFoto.setBackground(BLANCO);
+        lblFoto.setOpaque(true);
+        lblFoto.setForeground(CAFE_OSCURO);
 
-        JButton btnSeleccionarFoto = new JButton("Seleccionar foto...");
+        for (JTextField campo : new JTextField[]{txtNombre, txtPrecio}) {
+            campo.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(CAFE_CLARO, 1),
+                    BorderFactory.createEmptyBorder(3, 6, 3, 6)));
+            campo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        }
+        cbCategoria.setBackground(BLANCO);
+        cbCategoria.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JButton btnSeleccionarFoto = crearBoton("Seleccionar foto...");
+        btnSeleccionarFoto.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnSeleccionarFoto.addActionListener(e -> seleccionarFoto());
 
-        panelDatos.add(new JLabel("Nombre:"));
+        JLabel lblNombre = new JLabel("Nombre:");
+        JLabel lblCategoria = new JLabel("Categoría:");
+        JLabel lblPrecio = new JLabel("Precio de venta:");
+        for (JLabel lbl : new JLabel[]{lblNombre, lblCategoria, lblPrecio}) {
+            lbl.setForeground(CAFE_OSCURO);
+            lbl.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
+        }
+
+        panelDatos.add(lblNombre);
         panelDatos.add(txtNombre);
-        panelDatos.add(new JLabel("Categoría:"));
+        panelDatos.add(lblCategoria);
         panelDatos.add(cbCategoria);
-        panelDatos.add(new JLabel("Precio de venta:"));
+        panelDatos.add(lblPrecio);
         panelDatos.add(txtPrecio);
         panelDatos.add(Box.createVerticalStrut(10));
         panelDatos.add(lblFoto);
+        panelDatos.add(Box.createVerticalStrut(6));
         panelDatos.add(btnSeleccionarFoto);
 
         // ---------- Panel de receta ----------
         JPanel panelReceta = new JPanel(new BorderLayout(5, 5));
-        panelReceta.setBorder(BorderFactory.createTitledBorder("Receta (insumos requeridos)"));
+        panelReceta.setBackground(FONDO_CREMA);
+        panelReceta.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(CAFE_MEDIO, 1),
+                        "Receta (insumos requeridos)"),
+                BorderFactory.createEmptyBorder(6, 6, 6, 6)));
+        ((javax.swing.border.TitledBorder) ((javax.swing.border.CompoundBorder) panelReceta.getBorder()).getOutsideBorder())
+                .setTitleColor(CAFE_OSCURO);
 
         JPanel panelAgregarInsumo = new JPanel();
+        panelAgregarInsumo.setBackground(FONDO_CREMA);
         cbInsumoReceta = new JComboBox<>();
+        cbInsumoReceta.setBackground(BLANCO);
         cargarInsumosCombo();
         txtCantidadReceta = new JTextField(6);
-        JButton btnAgregarInsumo = new JButton("Agregar a receta");
+        txtCantidadReceta.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(CAFE_CLARO, 1),
+                BorderFactory.createEmptyBorder(3, 6, 3, 6)));
+        JButton btnAgregarInsumo = crearBoton("Agregar a receta");
         btnAgregarInsumo.addActionListener(e -> agregarInsumoAReceta());
 
+        JLabel lblCantidad = new JLabel("Cantidad:");
+        lblCantidad.setForeground(CAFE_OSCURO);
+        lblCantidad.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
         panelAgregarInsumo.add(cbInsumoReceta);
-        panelAgregarInsumo.add(new JLabel("Cantidad:"));
+        panelAgregarInsumo.add(lblCantidad);
         panelAgregarInsumo.add(txtCantidadReceta);
         panelAgregarInsumo.add(btnAgregarInsumo);
 
@@ -94,23 +150,36 @@ public class ProductoInternalFrame extends JInternalFrame {
             public boolean isCellEditable(int row, int col) { return false; }
         };
         tablaReceta = new JTable(modeloReceta);
-        JButton btnQuitarInsumo = new JButton("Quitar seleccionado");
+        estilizarTabla(tablaReceta);
+        JButton btnQuitarInsumo = crearBoton("Quitar seleccionado");
         btnQuitarInsumo.addActionListener(e -> quitarInsumoDeReceta());
+        JPanel panelQuitar = new JPanel();
+        panelQuitar.setBackground(FONDO_CREMA);
+        panelQuitar.add(btnQuitarInsumo);
+
+        JScrollPane scrollReceta = new JScrollPane(tablaReceta);
+        scrollReceta.setBorder(BorderFactory.createLineBorder(CAFE_CLARO, 1));
+        scrollReceta.getViewport().setBackground(BLANCO);
 
         panelReceta.add(panelAgregarInsumo, BorderLayout.NORTH);
-        panelReceta.add(new JScrollPane(tablaReceta), BorderLayout.CENTER);
-        panelReceta.add(btnQuitarInsumo, BorderLayout.SOUTH);
+        panelReceta.add(scrollReceta, BorderLayout.CENTER);
+        panelReceta.add(panelQuitar, BorderLayout.SOUTH);
 
         JPanel panelIzquierdo = new JPanel(new GridLayout(2, 1, 5, 5));
+        panelIzquierdo.setBackground(FONDO_CREMA);
         panelIzquierdo.add(panelDatos);
         panelIzquierdo.add(panelReceta);
 
         // ---------- Botones principales ----------
-        JPanel panelBotones = new JPanel();
-        JButton btnRegistrar = new JButton("Registrar producto");
-        JButton btnActualizar = new JButton("Actualizar producto");
-        JButton btnDeshabilitar = new JButton("Deshabilitar");
-        JButton btnLimpiar = new JButton("Limpiar");
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
+        panelBotones.setBackground(FONDO_CREMA);
+        JButton btnRegistrar = crearBoton("Registrar producto");
+        JButton btnActualizar = crearBoton("Actualizar producto");
+        JButton btnDeshabilitar = crearBoton("Deshabilitar");
+        JButton btnLimpiar = crearBoton("Limpiar");
+        JButton btnExportarMenu = crearBoton("Exportar menú a HTML");
+        btnExportarMenu.addActionListener(e -> exportarMenuHtml());
+        panelBotones.add(btnExportarMenu);
 
         btnRegistrar.addActionListener(e -> registrarProducto());
         btnActualizar.addActionListener(e -> actualizarProducto());
@@ -123,6 +192,7 @@ public class ProductoInternalFrame extends JInternalFrame {
         panelBotones.add(btnLimpiar);
 
         JPanel panelIzquierdoConBotones = new JPanel(new BorderLayout());
+        panelIzquierdoConBotones.setBackground(FONDO_CREMA);
         panelIzquierdoConBotones.add(panelIzquierdo, BorderLayout.CENTER);
         panelIzquierdoConBotones.add(panelBotones, BorderLayout.SOUTH);
 
@@ -133,14 +203,42 @@ public class ProductoInternalFrame extends JInternalFrame {
             public boolean isCellEditable(int row, int col) { return false; }
         };
         tablaProductos = new JTable(modeloProductos);
+        estilizarTabla(tablaProductos);
         tablaProductos.getSelectionModel().addListSelectionListener(e -> cargarSeleccionEnFormulario());
         JScrollPane scrollProductos = new JScrollPane(tablaProductos);
-        scrollProductos.setBorder(BorderFactory.createTitledBorder("Productos del menú"));
+        scrollProductos.getViewport().setBackground(BLANCO);
+        scrollProductos.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(CAFE_MEDIO, 1), "Productos del menú"));
+        ((javax.swing.border.TitledBorder) scrollProductos.getBorder()).setTitleColor(CAFE_OSCURO);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelIzquierdoConBotones, scrollProductos);
         splitPane.setDividerLocation(420);
+        splitPane.setBackground(FONDO_CREMA);
 
         add(splitPane, BorderLayout.CENTER);
+    }
+
+    private JButton crearBoton(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        boton.setBackground(CAFE_MEDIO);
+        boton.setForeground(BLANCO);
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return boton;
+    }
+
+    private void estilizarTabla(JTable tabla) {
+        tabla.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tabla.setRowHeight(24);
+        tabla.setGridColor(CAFE_CLARO);
+        tabla.setSelectionBackground(CAFE_CLARO);
+        tabla.setSelectionForeground(BLANCO);
+        tabla.getTableHeader().setBackground(CAFE_MEDIO);
+        tabla.getTableHeader().setForeground(BLANCO);
+        tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tabla.getTableHeader().setReorderingAllowed(false);
     }
 
     private void cargarInsumosCombo() {
@@ -326,4 +424,45 @@ public class ProductoInternalFrame extends JInternalFrame {
         }
         return true;
     }
+
+    private void exportarMenuHtml() {
+        List<Producto> productos = productoDAO.listarActivos();
+
+        StringBuilder tarjetas = new StringBuilder();
+        for (Producto p : productos) {
+            String imgTag = (p.getRutaFoto() != null)
+                    ? "<img src='" + com.pixel.util.ImagenUtil.rutaCompleta(p.getRutaFoto()) + "'>"
+                    : "<div class='sin-foto'>Sin imagen</div>";
+
+            tarjetas.append("<div class='producto'>")
+                    .append(imgTag)
+                    .append("<h3>").append(p.getNombre()).append("</h3>")
+                    .append("<p class='categoria'>").append(p.getCategoria().replace("_", " ")).append("</p>")
+                    .append("<p class='precio'>Q").append(String.format("%.2f", p.getPrecioVenta())).append("</p>")
+                    .append("</div>");
+        }
+
+        String html = "<html><head><meta charset='UTF-8'><style>" +
+                "body{font-family:Arial, sans-serif; background:#f7f4ef; margin:40px;}" +
+                "h1{color:#5b3a29; text-align:center;}" +
+                ".contenedor{display:flex; flex-wrap:wrap; gap:20px; justify-content:center;}" +
+                ".producto{background:white; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.1); " +
+                "padding:15px; width:220px; text-align:center;}" +
+                ".producto img{width:180px; height:180px; object-fit:cover; border-radius:8px;}" +
+                ".sin-foto{width:180px; height:180px; background:#eee; display:flex; align-items:center; " +
+                "justify-content:center; border-radius:8px; color:#999;}" +
+                ".categoria{color:#888; font-size:13px;}" +
+                ".precio{font-weight:bold; color:#5b3a29; font-size:16px;}" +
+                "</style></head><body>" +
+                "<h1>JavaBeans Café - Nuestro Menú</h1>" +
+                "<div class='contenedor'>" + tarjetas + "</div>" +
+                "</body></html>";
+
+        if (com.pixel.util.HtmlExportUtil.exportarDirecto(html, "menu_javabeans.html")) {
+            JOptionPane.showMessageDialog(this, "Menú descargado en tu carpeta de Descargas.");
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo exportar el menú.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 }

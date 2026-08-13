@@ -78,6 +78,24 @@ public class EmpleadoDAO {
         return lista;
     }
 
+    public List<Empleado> listarMeserosActivos() {
+        List<Empleado> lista = new ArrayList<>();
+        String sql = "SELECT * FROM empleado WHERE activo = TRUE AND rol = 'MESERO' ORDER BY nombre_completo";
+
+        try (Connection con = Conexion.obtenerConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(mapearEmpleado(rs));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al listar meseros: " + e.getMessage());
+        }
+        return lista;
+    }
+
     // ---------- ACTUALIZAR ----------
     public boolean actualizar(Empleado emp) {
         String sql = "UPDATE empleado SET nombre_completo=?, correo=?, rol=?, jornada=?, salario=? " +
