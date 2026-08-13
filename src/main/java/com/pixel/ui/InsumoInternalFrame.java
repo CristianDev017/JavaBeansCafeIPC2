@@ -13,6 +13,14 @@ public class InsumoInternalFrame extends JInternalFrame {
 
     private final InsumoDAO dao = new InsumoDAO();
 
+    // Colores tema café (mismos que MainFrame)
+    private static final Color CAFE_OSCURO = new Color(91, 58, 41);
+    private static final Color CAFE_MEDIO  = new Color(121, 85, 72);
+    private static final Color CAFE_CLARO  = new Color(166, 124, 82);
+    private static final Color FONDO_CREMA = new Color(230, 220, 205);
+    private static final Color BLANCO      = Color.WHITE;
+    private static final Color ALERTA_ROJA = new Color(255, 205, 205);
+
     private JTextField txtNombre, txtUnidad, txtStockActual, txtStockMinimo, txtCosto;
     private JTable tabla;
     private DefaultTableModel modeloTabla;
@@ -27,9 +35,17 @@ public class InsumoInternalFrame extends JInternalFrame {
 
     private void construirUI() {
         setLayout(new BorderLayout(10, 10));
+        getContentPane().setBackground(FONDO_CREMA);
 
-        JPanel panelForm = new JPanel(new GridLayout(3, 4, 5, 5));
-        panelForm.setBorder(BorderFactory.createTitledBorder("Datos del insumo"));
+        JPanel panelForm = new JPanel(new GridLayout(3, 4, 8, 8));
+        panelForm.setBackground(FONDO_CREMA);
+        panelForm.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(CAFE_MEDIO, 1),
+                        "Datos del insumo"),
+                BorderFactory.createEmptyBorder(8, 8, 8, 8)));
+        ((javax.swing.border.TitledBorder) ((javax.swing.border.CompoundBorder) panelForm.getBorder()).getOutsideBorder())
+                .setTitleColor(CAFE_OSCURO);
 
         txtNombre = new JTextField();
         txtUnidad = new JTextField();
@@ -37,26 +53,44 @@ public class InsumoInternalFrame extends JInternalFrame {
         txtStockMinimo = new JTextField();
         txtCosto = new JTextField();
 
-        panelForm.add(new JLabel("Nombre:"));
+        for (JTextField campo : new JTextField[]{txtNombre, txtUnidad, txtStockActual, txtStockMinimo, txtCosto}) {
+            campo.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(CAFE_CLARO, 1),
+                    BorderFactory.createEmptyBorder(3, 6, 3, 6)));
+        }
+
+        JLabel lblNombre = new JLabel("Nombre:");
+        JLabel lblUnidad = new JLabel("Unidad de medida:");
+        JLabel lblStockActual = new JLabel("Stock inicial:");
+        JLabel lblStockMinimo = new JLabel("Stock mínimo:");
+        JLabel lblCosto = new JLabel("Costo:");
+        for (JLabel lbl : new JLabel[]{lblNombre, lblUnidad, lblStockActual, lblStockMinimo, lblCosto}) {
+            lbl.setForeground(CAFE_OSCURO);
+            lbl.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        }
+
+        panelForm.add(lblNombre);
         panelForm.add(txtNombre);
-        panelForm.add(new JLabel("Unidad de medida:"));
+        panelForm.add(lblUnidad);
         panelForm.add(txtUnidad);
 
-        panelForm.add(new JLabel("Stock inicial:"));
+        panelForm.add(lblStockActual);
         panelForm.add(txtStockActual);
-        panelForm.add(new JLabel("Stock mínimo:"));
+        panelForm.add(lblStockMinimo);
         panelForm.add(txtStockMinimo);
 
-        panelForm.add(new JLabel("Costo:"));
+        panelForm.add(lblCosto);
         panelForm.add(txtCosto);
         panelForm.add(new JLabel(""));
         panelForm.add(new JLabel(""));
 
-        JPanel panelBotones = new JPanel();
-        JButton btnRegistrar = new JButton("Registrar");
-        JButton btnActualizar = new JButton("Actualizar");
-        JButton btnRegistrarCompra = new JButton("Registrar compra (+stock)");
-        JButton btnLimpiar = new JButton("Limpiar");
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 8));
+        panelBotones.setBackground(FONDO_CREMA);
+
+        JButton btnRegistrar = crearBoton("Registrar");
+        JButton btnActualizar = crearBoton("Actualizar");
+        JButton btnRegistrarCompra = crearBoton("Registrar compra (+stock)");
+        JButton btnLimpiar = crearBoton("Limpiar");
 
         btnRegistrar.addActionListener(e -> registrarInsumo());
         btnActualizar.addActionListener(e -> actualizarInsumo());
@@ -69,6 +103,7 @@ public class InsumoInternalFrame extends JInternalFrame {
         panelBotones.add(btnLimpiar);
 
         JPanel panelSuperior = new JPanel(new BorderLayout());
+        panelSuperior.setBackground(FONDO_CREMA);
         panelSuperior.add(panelForm, BorderLayout.CENTER);
         panelSuperior.add(panelBotones, BorderLayout.SOUTH);
 
@@ -78,9 +113,19 @@ public class InsumoInternalFrame extends JInternalFrame {
             public boolean isCellEditable(int row, int col) { return false; }
         };
         tabla = new JTable(modeloTabla);
+        tabla.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tabla.setRowHeight(24);
+        tabla.setGridColor(CAFE_CLARO);
+        tabla.setSelectionBackground(CAFE_CLARO);
+        tabla.setSelectionForeground(BLANCO);
+        tabla.getTableHeader().setBackground(CAFE_MEDIO);
+        tabla.getTableHeader().setForeground(BLANCO);
+        tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tabla.getTableHeader().setReorderingAllowed(false);
+
         tabla.getSelectionModel().addListSelectionListener(e -> cargarSeleccionEnFormulario());
 
-        // ---------- Alerta visual: fila roja si el stock está bajo ----------
+        // ---------- Alerta visual: fila roja si el stock está bajo (se mantiene igual, solo ajusta el color base) ----------
         tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -93,9 +138,9 @@ public class InsumoInternalFrame extends JInternalFrame {
 
                 if (!isSelected) {
                     if (stockActual <= stockMinimo) {
-                        c.setBackground(new Color(255, 205, 205)); // rojo suave: alerta
+                        c.setBackground(ALERTA_ROJA); // rojo suave: alerta
                     } else {
-                        c.setBackground(Color.WHITE);
+                        c.setBackground(BLANCO);
                     }
                 }
                 return c;
@@ -103,9 +148,22 @@ public class InsumoInternalFrame extends JInternalFrame {
         });
 
         JScrollPane scroll = new JScrollPane(tabla);
+        scroll.setBorder(BorderFactory.createLineBorder(CAFE_CLARO, 1));
+        scroll.getViewport().setBackground(BLANCO);
 
         add(panelSuperior, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
+    }
+
+    private JButton crearBoton(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        boton.setBackground(CAFE_MEDIO);
+        boton.setForeground(BLANCO);
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return boton;
     }
 
     private void cargarTabla() {

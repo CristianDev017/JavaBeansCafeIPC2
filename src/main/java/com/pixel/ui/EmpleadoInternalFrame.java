@@ -13,6 +13,13 @@ public class EmpleadoInternalFrame extends JInternalFrame {
 
     private final EmpleadoDAO dao = new EmpleadoDAO();
 
+    // Colores tema café (mismos que MainFrame)
+    private static final Color CAFE_OSCURO = new Color(91, 58, 41);
+    private static final Color CAFE_MEDIO  = new Color(121, 85, 72);
+    private static final Color CAFE_CLARO  = new Color(166, 124, 82);
+    private static final Color FONDO_CREMA = new Color(230, 220, 205);
+    private static final Color BLANCO      = Color.WHITE;
+
     // Componentes del formulario
     private JTextField txtDpi, txtNombre, txtCorreo, txtSalario;
     private JComboBox<String> cbRol, cbJornada;
@@ -29,10 +36,18 @@ public class EmpleadoInternalFrame extends JInternalFrame {
 
     private void construirUI() {
         setLayout(new BorderLayout(10, 10));
+        getContentPane().setBackground(FONDO_CREMA);
 
         // ---------- Panel de formulario (arriba) ----------
-        JPanel panelForm = new JPanel(new GridLayout(3, 4, 5, 5));
-        panelForm.setBorder(BorderFactory.createTitledBorder("Datos del empleado"));
+        JPanel panelForm = new JPanel(new GridLayout(3, 4, 8, 8));
+        panelForm.setBackground(FONDO_CREMA);
+        panelForm.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(CAFE_MEDIO, 1),
+                        "Datos del empleado"),
+                BorderFactory.createEmptyBorder(8, 8, 8, 8)));
+        ((javax.swing.border.TitledBorder) ((javax.swing.border.CompoundBorder) panelForm.getBorder()).getOutsideBorder())
+                .setTitleColor(CAFE_OSCURO);
 
         txtDpi = new JTextField();
         txtNombre = new JTextField();
@@ -41,27 +56,48 @@ public class EmpleadoInternalFrame extends JInternalFrame {
         cbRol = new JComboBox<>(new String[]{"MESERO", "COCINA", "BARISTA", "ADMINISTRADOR"});
         cbJornada = new JComboBox<>(new String[]{"MATUTINA", "VESPERTINA", "NOCTURNA"});
 
-        panelForm.add(new JLabel("DPI:"));
+        for (JTextField campo : new JTextField[]{txtDpi, txtNombre, txtCorreo, txtSalario}) {
+            campo.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(CAFE_CLARO, 1),
+                    BorderFactory.createEmptyBorder(3, 6, 3, 6)));
+        }
+        cbRol.setBackground(BLANCO);
+        cbJornada.setBackground(BLANCO);
+
+        JLabel lblDpi = new JLabel("DPI:");
+        JLabel lblNombre = new JLabel("Nombre completo:");
+        JLabel lblCorreo = new JLabel("Correo:");
+        JLabel lblSalario = new JLabel("Salario:");
+        JLabel lblRol = new JLabel("Rol:");
+        JLabel lblJornada = new JLabel("Jornada:");
+        for (JLabel lbl : new JLabel[]{lblDpi, lblNombre, lblCorreo, lblSalario, lblRol, lblJornada}) {
+            lbl.setForeground(CAFE_OSCURO);
+            lbl.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        }
+
+        panelForm.add(lblDpi);
         panelForm.add(txtDpi);
-        panelForm.add(new JLabel("Nombre completo:"));
+        panelForm.add(lblNombre);
         panelForm.add(txtNombre);
 
-        panelForm.add(new JLabel("Correo:"));
+        panelForm.add(lblCorreo);
         panelForm.add(txtCorreo);
-        panelForm.add(new JLabel("Salario:"));
+        panelForm.add(lblSalario);
         panelForm.add(txtSalario);
 
-        panelForm.add(new JLabel("Rol:"));
+        panelForm.add(lblRol);
         panelForm.add(cbRol);
-        panelForm.add(new JLabel("Jornada:"));
+        panelForm.add(lblJornada);
         panelForm.add(cbJornada);
 
         // ---------- Panel de botones ----------
-        JPanel panelBotones = new JPanel();
-        JButton btnRegistrar = new JButton("Registrar");
-        JButton btnActualizar = new JButton("Actualizar");
-        JButton btnDeshabilitar = new JButton("Deshabilitar");
-        JButton btnLimpiar = new JButton("Limpiar");
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 8));
+        panelBotones.setBackground(FONDO_CREMA);
+
+        JButton btnRegistrar = crearBoton("Registrar");
+        JButton btnActualizar = crearBoton("Actualizar");
+        JButton btnDeshabilitar = crearBoton("Deshabilitar");
+        JButton btnLimpiar = crearBoton("Limpiar");
 
         btnRegistrar.addActionListener(e -> registrarEmpleado());
         btnActualizar.addActionListener(e -> actualizarEmpleado());
@@ -74,6 +110,7 @@ public class EmpleadoInternalFrame extends JInternalFrame {
         panelBotones.add(btnLimpiar);
 
         JPanel panelSuperior = new JPanel(new BorderLayout());
+        panelSuperior.setBackground(FONDO_CREMA);
         panelSuperior.add(panelForm, BorderLayout.CENTER);
         panelSuperior.add(panelBotones, BorderLayout.SOUTH);
 
@@ -86,11 +123,34 @@ public class EmpleadoInternalFrame extends JInternalFrame {
             }
         };
         tabla = new JTable(modeloTabla);
+        tabla.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tabla.setRowHeight(24);
+        tabla.setGridColor(CAFE_CLARO);
+        tabla.setSelectionBackground(CAFE_CLARO);
+        tabla.setSelectionForeground(BLANCO);
+        tabla.getTableHeader().setBackground(CAFE_MEDIO);
+        tabla.getTableHeader().setForeground(BLANCO);
+        tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tabla.getTableHeader().setReorderingAllowed(false);
+
         tabla.getSelectionModel().addListSelectionListener(e -> cargarSeleccionEnFormulario());
         JScrollPane scroll = new JScrollPane(tabla);
+        scroll.setBorder(BorderFactory.createLineBorder(CAFE_CLARO, 1));
+        scroll.getViewport().setBackground(BLANCO);
 
         add(panelSuperior, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
+    }
+
+    private JButton crearBoton(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        boton.setBackground(CAFE_MEDIO);
+        boton.setForeground(BLANCO);
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return boton;
     }
 
     private void cargarTabla() {
