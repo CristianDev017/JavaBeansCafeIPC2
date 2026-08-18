@@ -14,9 +14,6 @@ public class NominaDAO {
 
     private final EmpleadoDAO empleadoDAO = new EmpleadoDAO();
 
-    // ---------- Punto de entrada: se llama al abrir el módulo de Nóminas ----------
-    // Revisa si "hoy" corresponde generar nóminas (5 días antes de quincena o fin de mes)
-    // y las genera si aún no existen para ese periodo.
     public void generarNominasSiCorresponde() {
         LocalDate hoy = LocalDate.of(2026, 8, 10);
         YearMonth mesActual = YearMonth.from(hoy);
@@ -55,8 +52,6 @@ public class NominaDAO {
         }
     }
 
-    // Evita generar dos veces la misma nómina si el usuario abre la app varias veces ese día.
-    // Se compara por mes y año de fecha_emision, no por día exacto, por seguridad.
     private boolean yaExisteNominaDelPeriodo(String dpi, String tipoPago, LocalDate fechaCorte) {
         String sql = "SELECT COUNT(*) FROM nomina WHERE dpi_empleado = ? AND tipo_pago = ? " +
                 "AND MONTH(fecha_emision) = ? AND YEAR(fecha_emision) = ?";
@@ -80,7 +75,6 @@ public class NominaDAO {
         }
     }
 
-    // Suma las propinas de las cuentas PAGADAS de ese mesero durante el mes del corte.
     private double obtenerPropinasDelMes(String dpiMesero, LocalDate fechaCorte) {
         String sql = "SELECT COALESCE(SUM(propina), 0) FROM cuenta " +
                 "WHERE dpi_mesero = ? AND estado = 'PAGADA' " +
@@ -121,7 +115,6 @@ public class NominaDAO {
         }
     }
 
-    // ---------- Marcar como pagado ----------
     public boolean marcarComoPagado(int codigoNomina) {
         String sql = "UPDATE nomina SET estado = 'PAGADO' WHERE codigo_nomina = ?";
         try (Connection con = Conexion.obtenerConexion();
@@ -134,7 +127,6 @@ public class NominaDAO {
         }
     }
 
-    // ---------- Listar todas ----------
     public List<Nomina> listarTodas() {
         List<Nomina> lista = new ArrayList<>();
         String sql = "SELECT n.*, e.nombre_completo FROM nomina n " +
